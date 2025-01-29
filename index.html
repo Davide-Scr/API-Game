@@ -3,29 +3,122 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avanti un Altro - Gioco IP</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Gioco dei Contrari - IP</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: linear-gradient(135deg, #1e3c72, #2a5298);
+            overflow: hidden;
+            position: relative;
+        }
+        .game-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        input {
+            padding: 10px;
+            width: 100%;
+            margin: 10px 0;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            border: none;
+            cursor: pointer;
+            border-radius: 5px;
+        }
+        .correct { color: green; }
+        .wrong { color: red; }
+        .hint { font-size: 0.9em; color: gray; }
+        .cubes {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: 1;
+        }
+        .cube {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            background: rgba(255, 255, 255, 0.3);
+            animation: float 5s infinite;
+        }
+        @keyframes float {
+            0% { transform: translateY(0); }
+            50% { transform: translateY(-100px); }
+            100% { transform: translateY(0); }
+        }
+    </style>
 </head>
 <body>
-    <div id="game-container">
-        <h1>Gioco Avanti un Altro - Indirizzi IP</h1>
-        <div id="question-container">
-            <p id="question"></p>
-        </div>
-        <div id="options-container">
-            <button class="option" id="option-1"></button>
-            <button class="option" id="option-2"></button>
-        </div>
-        <div id="timer-container">
-            <p>Tempo rimasto: <span id="timer">10</span> secondi</p>
-        </div>
-        <div id="score-container">
-            <p>Punteggio: <span id="score">0</span></p>
-        </div>
-        <div id="result-message"></div>
-        <button id="next-button" onclick="nextQuestion()" style="display: none;">Prossima domanda</button>
+    <div class="cubes"></div>
+    <div class="game-container">
+        <h2>Gioco dei Contrari - IP</h2>
+        <p>Contrario di: <strong id="question"></strong></p>
+        <p class="hint" id="hint" style="display: none;"></p>
+        <input type="text" id="answer" placeholder="Rispondi...">
+        <button onclick="checkAnswer()">Invia</button>
+        <button onclick="showHint()">Aiuto</button>
+        <p id="message"></p>
     </div>
-
-    <script src="script.js"></script>
+    <script>
+        const questions = [
+            { question: "IPv4", answer: "IPv6", hint: "La versione più recente." },
+            { question: "Public IP", answer: "Private IP", hint: "Usato nelle reti locali." },
+            { question: "Static IP", answer: "Dynamic IP", hint: "Cambia frequentemente." },
+            { question: "TCP", answer: "UDP", hint: "Protocollo senza connessione." },
+            { question: "Subnet Mask", answer: "Wildcard Mask", hint: "Usata per le ACL." }
+        ];
+        let currentIndex = 0;
+        function loadQuestion() {
+            document.getElementById("question").innerText = questions[currentIndex].question;
+            document.getElementById("hint").style.display = "none";
+            document.getElementById("answer").value = "";
+            document.getElementById("message").innerText = "";
+        }
+        function checkAnswer() {
+            const userAnswer = document.getElementById("answer").value.trim().toLowerCase();
+            if (userAnswer === questions[currentIndex].answer.toLowerCase()) {
+                document.getElementById("message").innerText = "Corretto! ✅";
+                document.getElementById("message").className = "correct";
+                setTimeout(() => {
+                    currentIndex = (currentIndex + 1) % questions.length;
+                    loadQuestion();
+                }, 1000);
+            } else {
+                document.getElementById("message").innerText = "Sbagliato! ❌";
+                document.getElementById("message").className = "wrong";
+            }
+        }
+        function showHint() {
+            document.getElementById("hint").innerText = questions[currentIndex].hint;
+            document.getElementById("hint").style.display = "block";
+        }
+        function createCubes() {
+            const container = document.querySelector(".cubes");
+            for (let i = 0; i < 30; i++) {
+                const cube = document.createElement("div");
+                cube.classList.add("cube");
+                cube.style.left = `${Math.random() * 100}vw`;
+                cube.style.top = `${Math.random() * 100}vh`;
+                cube.style.animationDuration = `${2 + Math.random() * 3}s`;
+                container.appendChild(cube);
+            }
+        }
+        createCubes();
+        loadQuestion();
+    </script>
 </body>
 </html>
